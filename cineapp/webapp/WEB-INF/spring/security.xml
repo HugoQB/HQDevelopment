@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<b:beans xmlns="http://www.springframework.org/schema/security"
+   xmlns:b="http://www.springframework.org/schema/beans" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans.xsd
+     http://www.springframework.org/schema/security 
+     http://www.springframework.org/schema/security/spring-security.xsd">
+
+   <http auto-config="true">
+   
+   	<intercept-url pattern="/peliculas/*" access="hasAnyAuthority('EDITOR', 'GERENTE')" />
+   	<intercept-url pattern="/horarios/*" access="hasAnyAuthority('EDITOR', 'GERENTE')" />
+   	<intercept-url pattern="/noticias/*" access="hasAnyAuthority('EDITOR', 'GERENTE')" />
+   	<intercept-url pattern="/banners/*" access="hasAnyAuthority('GERENTE')" />
+   
+   	<form-login login-page="/formLogin" default-target-url="/admin/index"
+   	/>
+   
+   </http>
+
+<!-- declaracion de usuarios en memoria para autenticacion-->
+<!--    <authentication-manager> -->
+<!-- 		<user-service> -->
+<!-- 		  <user name="hugo" password="{noop}hugh888" authorities="GERENTE" />		   -->
+<!-- 		  <user name="ale" password="{noop}ale888" authorities="EDITOR" />   -->
+<!-- 		</user-service> -->
+
+<!--    </authentication-manager> -->
+
+<!-- autenticacion desde la BD por defecto -->
+<!-- 		<authentication-manager> -->
+<!-- 		     <authentication-provider> -->
+<!-- 				<jdbc-user-service data-source-ref="dataSource"/> -->
+<!--      		</authentication-provider>	 -->
+<!-- 		</authentication-manager> -->
+
+<!-- 	autenticacion a BD personalizada -->
+	<b:bean id="encoder" 
+	class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+  </b:bean>
+
+		<authentication-manager>
+		     <authentication-provider>
+		     	<password-encoder ref="encoder"/>
+				<jdbc-user-service data-source-ref="dataSource"
+				users-by-username-query="select cuenta, pwd, activo from Usuarios where cuenta= ?"
+				authorities-by-username-query="select cuenta, perfil from Perfiles where cuenta= ?"
+				/>
+     		</authentication-provider>	
+		</authentication-manager>
+</b:beans>
